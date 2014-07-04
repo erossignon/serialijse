@@ -18,7 +18,7 @@ var declarePersistable = require("../").declarePersistable;
         this.brand = "Fiat";
         this.price = 10000.05;
         this.color = new Color("blue");
-        this.created_on= new Date();
+        this.created_on= new Date("04 May 1956 GMT");
     }
     declarePersistable(Vehicule);
     declarePersistable(Color);
@@ -42,7 +42,7 @@ var declarePersistable = require("../").declarePersistable;
 
             vehicule.brand = "Renault";
             vehicule.price = 95000;
-            vehicule.created_on = new Date("1949/05/05");
+            vehicule.created_on = new Date("04 May 1949 22:00:00 GMT");
 
             vehicule.should.be.instanceOf(Vehicule);
 
@@ -72,7 +72,7 @@ var declarePersistable = require("../").declarePersistable;
 
             vehicules[0].brand = "Renault";
             vehicules[0].price = 95000;
-            vehicules[0].created_on = new Date("1949/05/05");
+            vehicules[0].created_on = new Date("Wed, 04 May 1949 22:00:00 GMT");
 
             var serializationString = serialize(vehicules);
             //xx console.log(serializationString);
@@ -85,7 +85,7 @@ var declarePersistable = require("../").declarePersistable;
             var the_vehicule = new Vehicule();
             the_vehicule.brand = "Citroen";
             the_vehicule.price = 95000;
-            the_vehicule.created_on = new Date("1949/05/05");
+            the_vehicule.created_on = new Date("Wed, 04 May 1949 22:00:00 GMT");
 
             var vehicules = [ the_vehicule,the_vehicule ];
 
@@ -96,7 +96,7 @@ var declarePersistable = require("../").declarePersistable;
             should(the_vehicule.____index).eql(undefined);
 
             var expected  = '[['+
-                    '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
+                    '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":"Wed, 04 May 1949 22:00:00 GMT"}}},' +
                     '{"c":"Color","d":{"name":"blue"}}' +
                     '],'+'{"a":[{"o":0},{"o":0}]}]';
 
