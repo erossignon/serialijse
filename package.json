@@ -6,6 +6,15 @@
   "scripts": {
     "test": "mocha -R spec"
   },
+
+   "testling": {
+        "harness": "mocha-bdd",
+        "files": "test/*.js",
+        "browsers": [
+            "chrome/latest",
+            "firefox/latest"
+        ]
+   },
   "keywords": [
     "persistance",
     "serialize",
