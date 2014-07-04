@@ -19,7 +19,8 @@
   "author": "Etienne Rossignon",
   "license": "MIT",
   "devDependencies": {
-    "should": "^4.0.4"
+    "should": "^4.0.4",
+    "mocha": "latest"
   },
   "dependencies": {
     "underscore": "^1.6.0"
