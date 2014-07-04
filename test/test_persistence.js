@@ -96,7 +96,7 @@ var declarePersistable = require("../").declarePersistable;
             should(the_vehicule.____index).eql(undefined);
 
             var expected  = '[['+
-                    '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":"1949-05-04T22:00:00.000Z"}}},' +
+                    '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
                     '{"c":"Color","d":{"name":"blue"}}' +
                     '],'+'{"a":[{"o":0},{"o":0}]}]';
 
