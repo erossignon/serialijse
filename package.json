@@ -1,0 +1,27 @@
+{
+  "name": "serialijse",
+  "version": "0.0.0",
+  "description": "serialize and deserialize your javascript objects, preserve your object model ",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "keywords": [
+    "persistance",
+    "serialize",
+    "deserialize",
+    "persistence",
+    "save",
+    "load",
+    "javascript",
+    "json"
+  ],
+  "author": "Etienne Rossignon",
+  "license": "MIT",
+  "devDependencies": {
+    "should": "^4.0.4"
+  },
+  "dependencies": {
+    "underscore": "^1.6.0"
+  }
+}
