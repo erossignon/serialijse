@@ -8,3 +8,6 @@ serialize and deserialize javascript object, preserve your object model
 [![Coverage Status](https://img.shields.io/coveralls/erossignon/serialijse.svg)](https://coveralls.io/r/erossignon/serialijse)
 [![Code Climate](https://codeclimate.com/github/erossignon/serialijse.png)](https://codeclimate.com/github/erossignon/serialijse)
 
+[![NPM](https://nodei.co/npm/serialijse.png)](https://nodei.co/npm/serialijse/)
+
+
