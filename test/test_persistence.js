@@ -30,7 +30,7 @@ var declarePersistable = require("../").declarePersistable;
 
             var vehicule = { name: "GM" };
             var serializationString = serialize(vehicule);
-            console.log(serializationString);
+            //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
 
             reconstructedObject.should.eql(vehicule);
@@ -47,7 +47,7 @@ var declarePersistable = require("../").declarePersistable;
             vehicule.should.be.instanceOf(Vehicule);
 
             var serializationString = serialize(vehicule);
-            console.log(serializationString);
+            //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
 
             reconstructedObject.should.eql(vehicule);
@@ -59,7 +59,7 @@ var declarePersistable = require("../").declarePersistable;
             var vehicule = new Vehicule();
             vehicule.passengers =["Joe","Jack"];
             var serializationString = serialize(vehicule);
-            console.log(serializationString);
+            //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
 
             reconstructedObject.should.eql(vehicule);
@@ -75,7 +75,7 @@ var declarePersistable = require("../").declarePersistable;
             vehicules[0].created_on = new Date("1949/05/05");
 
             var serializationString = serialize(vehicules);
-            console.log(serializationString);
+            //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
             reconstructedObject.should.eql(vehicules);
         });
@@ -102,7 +102,7 @@ var declarePersistable = require("../").declarePersistable;
 
             serializationString.should.eql(expected);
 
-            console.log(serializationString);
+            //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
 
             reconstructedObject.length.should.eql(2);
@@ -141,7 +141,20 @@ var declarePersistable = require("../").declarePersistable;
             }).throwError();   // Circular
 
             var serializationString = serialize(mark);
-            console.log(serializationString);
+            //xx console.log(serializationString);
+
+            var mark_reloaded = deserialize(serializationString);
+
+            mark_reloaded.name.should.eql("mark");
+            mark_reloaded.children.length.should.eql(2);
+            mark_reloaded.should.be.instanceOf(Person);
+            mark_reloaded.children[0].should.be.instanceOf(Person);
+            mark_reloaded.children[1].should.be.instanceOf(Person);
+
+            mark_reloaded.children[0].parent.should.equal(mark_reloaded);
+            mark_reloaded.children[1].parent.should.equal(mark_reloaded);
+            mark_reloaded.children[0].name.should.eql("valery");
+            mark_reloaded.children[1].name.should.eql("edgar");
 
         });
     });
