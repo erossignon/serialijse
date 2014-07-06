@@ -157,6 +157,61 @@ var declarePersistable = require("../").declarePersistable;
             mark_reloaded.children[1].name.should.eql("edgar");
 
         });
+
+
+        it("should not persist property defined in class prototype",function () {
+
+            function Rectangle() {
+                this.width = 10;
+                this.height = 20;
+                Object.defineProperty(this,"area",{
+                   get: function() {
+                       return this.width * this.height;
+                   }
+                });
+            }
+            Rectangle.prototype.__defineGetter__("perimeter",function(){
+                return (this.width + this.height)*2.0;
+            });
+            declarePersistable(Rectangle);
+
+
+            var rect1 = new Rectangle();
+            rect1.width = 100;
+            rect1.height= 2;
+            rect1.area.should.equal(200);
+            rect1.perimeter.should.equal(204);
+
+            var serializationString = serialize(rect1);
+            //xx console.log(serializationString);
+
+            var rect2 = deserialize(serializationString);
+            rect2.area.should.equal(200);
+            rect2.perimeter.should.equal(204);
+
+        });
+
+        it("testing compression impact ",function(done){
+
+            var serializeZ = require("../").serializeZ;
+            var deserializeZ = require("../").deserializeZ;
+
+            var vehicules = [new Vehicule(),new Vehicule(),new Vehicule()];
+
+            var uncompressed_serializationString = serialize(vehicules);
+
+            serializeZ(vehicules,function(err,buffer){
+                var serializationString = buffer.toString("base64");
+
+                var compression_ratio = Math.round(100.0- 100.0*(buffer.length/uncompressed_serializationString.length));
+                console.log("uncompress = ", uncompressed_serializationString.length,  "compressed =",buffer.length," ratio ", compression_ratio,"%");
+                deserializeZ(buffer,function(err,reconstructedObject){
+                    done(err);
+                    reconstructedObject.should.eql(vehicules);
+                });
+
+            });
+        }) ;
     });
 
 }());
