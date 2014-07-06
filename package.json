@@ -1,20 +1,19 @@
 {
   "name": "serialijse",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "serialize and deserialize your javascript objects, preserve your object model ",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec"
   },
-
-   "testling": {
-        "harness": "mocha-bdd",
-        "files": "test/*.js",
-        "browsers": [
-            "chrome/latest",
-            "firefox/latest"
-        ]
-   },
+  "testling": {
+    "harness": "mocha-bdd",
+    "files": "test/*.js",
+    "browsers": [
+      "chrome/latest",
+      "firefox/latest"
+    ]
+  },
   "keywords": [
     "persistance",
     "serialize",
