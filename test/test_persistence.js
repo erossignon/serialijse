@@ -211,7 +211,20 @@ var declarePersistable = require("../").declarePersistable;
                 });
 
             });
-        }) ;
+        });
+
+        it("should persist object with boolean", function(done) {
+
+            var vehicule = new Vehicule();
+            vehicule.requireServicing = true;
+
+            var serializationString = serialize(vehicule);
+            //xx console.log(serializationString);
+            var reconstructedObject = deserialize(serializationString);
+            reconstructedObject.should.eql(vehicule);
+
+            done();
+        });
     });
 
 }());
