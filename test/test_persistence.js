@@ -225,6 +225,26 @@ var declarePersistable = require("../").declarePersistable;
 
             done();
         });
+
+        it("should persist an object with a  undefined property",function(done){
+
+            var vehicule = new Vehicule();
+            vehicule.serviceDate = [ undefined, new Date("2013/01/02")];
+
+            // try to mess with the serialisation algo by adding a fake null property
+            vehicule.toto = null;
+            vehicule.hasOwnProperty('toto').should.equal(true);
+            var serializationString = serialize(vehicule);
+
+            // delete it as it should not interfer
+            delete vehicule.toto;
+
+            //xx console.log(serializationString);
+            var reconstructedObject = deserialize(serializationString);
+            reconstructedObject.should.eql(vehicule);
+
+            done();
+        });
     });
 
 }());
