@@ -233,7 +233,6 @@ var declarePersistable = require("../").declarePersistable;
 
             // try to mess with the serialisation algo by adding a fake null property
             vehicule.toto = null;
-            vehicule.hasOwnProperty('toto').should.equal(true);
             var serializationString = serialize(vehicule);
 
             // delete it as it should not interfer
@@ -245,6 +244,22 @@ var declarePersistable = require("../").declarePersistable;
 
             done();
         });
+
+        it("should deserialize from an already parsed JSON string",function(done) {
+
+            var vehicule = new Vehicule();
+
+            var serializationString = serialize(vehicule);
+
+            var json_obj = JSON.parse(serializationString);
+
+            var reconstructedObject = deserialize(json_obj);
+            reconstructedObject.should.eql(vehicule);
+
+          done();
+
+        });
+
     });
 
 }());
