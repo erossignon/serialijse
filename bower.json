@@ -1,0 +1,29 @@
+{
+  "name": "serialijse",
+  "main": "index.js",
+  "version": "0.0.6",
+  "homepage": "https://github.com/erossignon/serialijse",
+  "authors": [
+    "Etienne Rossignon <etienne.rossignon@gadz.org>"
+  ],
+  "description": "serialize and deserialize javascript object, preserve your object model",
+  "keywords": [
+    "persistence",
+    "JSON",
+    "stringify",
+    "parse",
+    "object",
+    "model",
+    "cyclic"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "index.js",
+    "lib",
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
