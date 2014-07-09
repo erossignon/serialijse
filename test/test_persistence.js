@@ -96,7 +96,7 @@ var declarePersistable = require("../").declarePersistable;
             should(the_vehicule.____index).eql(undefined);
 
             var expected  = '[['+
-                    '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":"Wed, 04 May 1949 22:00:00 GMT"}}},' +
+                    '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
                     '{"c":"Color","d":{"name":"blue"}}' +
                     '],'+'{"a":[{"o":0},{"o":0}]}]';
 
@@ -111,53 +111,6 @@ var declarePersistable = require("../").declarePersistable;
 
 
         });
-
-        it("should persist a shared object only once", function () {
-
-            function Person(name) {
-                this.name= name;
-                this.parent = null;
-                this.children = [];
-            }
-
-            declarePersistable(Person);
-
-            Person.prototype.addChild = function(name) {
-                var child = new Person(name);
-                child.parent = this;
-                this.children.push(child);
-                return child;
-            };
-
-            var mark = new Person("mark"),
-               valery = mark.addChild("valery"),
-               edgar = mark.addChild("edgar");
-
-            valery.parent.should.equal(mark);
-            edgar.parent.should.equal(mark);
-
-            should(function(){
-                JSON.stringify(mark);
-            }).throwError();   // Circular
-
-            var serializationString = serialize(mark);
-            //xx console.log(serializationString);
-
-            var mark_reloaded = deserialize(serializationString);
-
-            mark_reloaded.name.should.eql("mark");
-            mark_reloaded.children.length.should.eql(2);
-            mark_reloaded.should.be.instanceOf(Person);
-            mark_reloaded.children[0].should.be.instanceOf(Person);
-            mark_reloaded.children[1].should.be.instanceOf(Person);
-
-            mark_reloaded.children[0].parent.should.equal(mark_reloaded);
-            mark_reloaded.children[1].parent.should.equal(mark_reloaded);
-            mark_reloaded.children[0].name.should.eql("valery");
-            mark_reloaded.children[1].name.should.eql("edgar");
-
-        });
-
 
         it("should not persist property defined in class prototype",function () {
 
@@ -226,7 +179,7 @@ var declarePersistable = require("../").declarePersistable;
             done();
         });
 
-        it("should persist an object with a  undefined property",function(done){
+        it("should persist an object with a undefined property",function(done){
 
             var vehicule = new Vehicule();
             vehicule.serviceDate = [ undefined, new Date("2013/01/02")];
@@ -258,6 +211,76 @@ var declarePersistable = require("../").declarePersistable;
 
           done();
 
+        });
+
+        it("unlike JSON.stringify/parse, it should serialize a standard object and preserve date",function(){
+
+
+            var some_object = {
+                the_date: new Date()
+            };
+
+            some_object.the_date.should.be.instanceOf(Date);
+            var serializationString = serialize(some_object);
+
+            console.log("serializationString= ",serializationString);
+            var reconstructedObject = deserialize(serializationString);
+
+            console.log(reconstructedObject);
+
+            reconstructedObject.the_date.should.be.instanceOf(Date);
+
+            reconstructedObject.the_date.should.eql(some_object.the_date);
+
+            reconstructedObject.should.eql(some_object);
+
+            reconstructedObject.should.eql(some_object);
+
+        });
+
+
+        it("unlike JSON.stringify/parse, it should persist object that contains cyclic object value", function () {
+
+            function Person(name) {
+                this.name= name;
+                this.parent = null;
+                this.children = [];
+            }
+
+            declarePersistable(Person);
+
+            Person.prototype.addChild = function(name) {
+                var child = new Person(name);
+                child.parent = this;
+                this.children.push(child);
+                return child;
+            };
+
+            var mark   = new Person("mark"),
+                valery = mark.addChild("valery"),
+                edgar  = mark.addChild("edgar");
+
+            valery.parent.should.equal(mark);
+            edgar.parent.should.equal(mark);
+
+            should(function(){
+                JSON.stringify(mark);
+            }).throwError();   // Circular
+
+            var serializationString = serialize(mark);
+            //xx console.log(serializationString);
+
+            var mark_reloaded = deserialize(serializationString);
+            mark_reloaded.name.should.eql("mark");
+            mark_reloaded.children.length.should.eql(2);
+            mark_reloaded.should.be.instanceOf(Person);
+            mark_reloaded.children[0].should.be.instanceOf(Person);
+            mark_reloaded.children[1].should.be.instanceOf(Person);
+
+            mark_reloaded.children[0].parent.should.equal(mark_reloaded);
+            mark_reloaded.children[1].parent.should.equal(mark_reloaded);
+            mark_reloaded.children[0].name.should.eql("valery");
+            mark_reloaded.children[1].name.should.eql("edgar");
         });
 
     });
