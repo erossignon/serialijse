@@ -7,7 +7,7 @@ before_script:
   - npm install -g istanbul coveralls
   - npm install -g mocha
   - npm install -g browserify 
-  - npm install -g uglifyjs
+  - npm install -g uglify-js
   - npm install
 
 after_success:
