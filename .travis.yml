@@ -6,6 +6,8 @@ node_js:
 before_script:
   - npm install -g istanbul coveralls
   - npm install -g mocha
+  - npm install -g browserify 
+  - npm install -g uglify 
   - npm install
 
 after_success:
