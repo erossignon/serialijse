@@ -1,11 +1,15 @@
 {
   "name": "serialijse",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "serialize and deserialize your javascript objects, preserve your object model ",
   "main": "index.js",
   "scripts": {
-    "pretest": "browserify -r serialijse index.js > serialijse.bundle.js; uglifyjs serialijse.bundle.js -o serialijse.bundle.min.js",
+    "pretest": "browserify index.js > serialijse.bundle.js; uglifyjs serialijse.bundle.js -o serialijse.bundle.min.js",
     "test": "mocha -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erossignon/serialijse.git"
   },
   "testling": {
     "harness": "mocha-bdd",
@@ -28,8 +32,9 @@
   "author": "Etienne Rossignon",
   "license": "MIT",
   "devDependencies": {
+    "mocha": "latest",
     "should": "^4.0.4",
-    "mocha": "latest"
+    "uglify-js": "^2.4.15"
   },
   "dependencies": {
     "underscore": "^1.6.0"
