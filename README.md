@@ -1,7 +1,7 @@
 serialijse
 ==========
 
-serialize and deserialize javascript object, preserve your object model
+serialize and deserialize javascript object, preserve your object model. persistance and serialization in javascript and nodejs.
 
 
 [![Build Status](https://travis-ci.org/erossignon/serialijse.svg?branch=master)](https://travis-ci.org/erossignon/serialijse)
