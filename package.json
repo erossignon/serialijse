@@ -33,7 +33,7 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "latest",
-    "should": "^4.0.4",
+    "should": "^4.4.2",
     "uglify-js": "^2.4.15"
   },
   "dependencies": {
