@@ -12,7 +12,7 @@ var declarePersistable = require("../").declarePersistable;
 
     function Color(colorName) {
         this.name = colorName;
-    };
+    }
 
     function Vehicule() {
         this.brand = "Fiat";
@@ -157,7 +157,7 @@ var declarePersistable = require("../").declarePersistable;
                 var serializationString = buffer.toString("base64");
 
                 var compression_ratio = Math.round(100.0- 100.0*(buffer.length/uncompressed_serializationString.length));
-                console.log("uncompress = ", uncompressed_serializationString.length,  "compressed =",buffer.length," ratio ", compression_ratio,"%");
+                console.log("           = ", uncompressed_serializationString.length,  "compressed =",buffer.length," ratio ", compression_ratio,"%");
                 deserializeZ(buffer,function(err,reconstructedObject){
                     done(err);
                     reconstructedObject.should.eql(vehicules);
@@ -182,7 +182,7 @@ var declarePersistable = require("../").declarePersistable;
         it("should persist an object with a undefined property",function(done){
 
             var vehicule = new Vehicule();
-            vehicule.serviceDate = [ undefined, new Date("2013/01/02")];
+            vehicule.serviceDate = [ null, new Date("2013/01/02")];
 
             // try to mess with the serialisation algo by adding a fake null property
             vehicule.toto = null;
@@ -191,7 +191,6 @@ var declarePersistable = require("../").declarePersistable;
             // delete it as it should not interfer
             delete vehicule.toto;
 
-            //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
             reconstructedObject.should.eql(vehicule);
 
@@ -223,10 +222,7 @@ var declarePersistable = require("../").declarePersistable;
             some_object.the_date.should.be.instanceOf(Date);
             var serializationString = serialize(some_object);
 
-            console.log("serializationString= ",serializationString);
             var reconstructedObject = deserialize(serializationString);
-
-            console.log(reconstructedObject);
 
             reconstructedObject.the_date.should.be.instanceOf(Date);
 
