@@ -102,7 +102,7 @@ function testing_javascript_serialization_objects_with_cyclic_dependencies() {
     var so = s.deserialize(str);
     console.log(" However Serialijse knows to manage object with cyclic deps !");
     console.log(so);
-    assert(so[0].friends[0] == so[1]); // Mary's friend is Bob
+    assert(so[0].friends[0] === so[1]); // Mary's friend is Bob
 }
 testing_javascript_serialization_objects_with_cyclic_dependencies();
 
