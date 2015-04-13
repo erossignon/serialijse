@@ -9,6 +9,7 @@ before_script:
   - npm install -g mocha
   - npm install -g browserify 
   - npm install -g uglify-js
+  - npm install -g uglifyjs
   - npm install
 
 after_success:
