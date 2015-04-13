@@ -34,7 +34,31 @@ npm install serialijse
 ````
 
 
+Using serialijse in browser
+----------------------------
 
+````sh
+bower install serialijse
+````
+
+```html
+<script src="components/serialijse/dist/serialijse.bundle.js">
+
+<script>
+var serialize = serialijse.serialize;
+var deserialize = serialijse.deserialize;
+var declarePersistable = serialijse.declarePersistable;
+var serializeZ = serialijse.serializeZ;
+var deserializeZ = serialijse.deserializeZ;
+
+var vehicule = new Vehicule();
+...
+var serializationString = serialize(vehicule);
+...
+var reconstructedObject = deserialize(serializationString);
+
+</script>
+```
 Examples
 ========
 
