@@ -4,7 +4,7 @@
     "dist/serialijse.bundle.js",
     "dist/serialijse.bundle.min.js"
   ],
-  "version": "0.0.12",
+  "version": "0.0.15",
   "homepage": "https://github.com/erossignon/serialijse",
   "authors": [
     "Etienne Rossignon <etienne.rossignon@gadz.org>"
