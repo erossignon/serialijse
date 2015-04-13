@@ -1,10 +1,10 @@
 {
   "name": "serialijse",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "description": "serialize and deserialize your javascript objects, preserve your object model ",
   "main": "index.js",
   "scripts": {
-    "pretest": "browserify index.js > serialijse.bundle.js; uglifyjs serialijse.bundle.js -o serialijse.bundle.min.js",
+    "pretest": "browserify  index.js --standalone serialijse > dist/serialijse.bundle.js && uglifyjs2 dist/serialijse.bundle.js -o dist/serialijse.bundle.min.js",
     "test": "mocha -R spec"
   },
   "repository": {

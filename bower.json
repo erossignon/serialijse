@@ -1,11 +1,19 @@
 {
   "name": "serialijse",
-  "main": "index.js",
-  "version": "0.0.6",
+  "main": [
+    "dist/serialijse.bundle.js",
+    "dist/serialijse.bundle.min.js"
+  ],
+  "version": "0.0.8",
   "homepage": "https://github.com/erossignon/serialijse",
   "authors": [
     "Etienne Rossignon <etienne.rossignon@gadz.org>"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erossignon/serialijse.git"
+  },
+  "moduleType": "global",
   "description": "serialize and deserialize javascript object, preserve your object model",
   "keywords": [
     "persistence",
@@ -19,7 +27,6 @@
   "license": "MIT",
   "ignore": [
     "index.js",
-    "lib",
     "**/.*",
     "node_modules",
     "bower_components",

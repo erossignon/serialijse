@@ -2,7 +2,7 @@
 var should = require("should"),
     _ = require("underscore");
 
-var serialize = require("../").serialize;
+    var serialize = require("../").serialize;
 var deserialize = require("../").deserialize;
 var declarePersistable = require("../").declarePersistable;
 
