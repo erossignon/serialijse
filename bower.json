@@ -4,7 +4,7 @@
     "dist/serialijse.bundle.js",
     "dist/serialijse.bundle.min.js"
   ],
-  "version": "0.0.8",
+  "version": "0.0.10",
   "homepage": "https://github.com/erossignon/serialijse",
   "authors": [
     "Etienne Rossignon <etienne.rossignon@gadz.org>"
@@ -26,11 +26,12 @@
   ],
   "license": "MIT",
   "ignore": [
-    "index.js",
-    "**/.*",
-    "node_modules",
+    "*.js",
     "bower_components",
-    "test",
-    "tests"
+    "lib",
+    "node_modules",
+    ".*",
+    "Makefile",
+    "README.md"
   ]
 }

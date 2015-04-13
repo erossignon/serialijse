@@ -1,14 +1,18 @@
 /*global describe, it*/
-var should = require("should"),
-    _ = require("underscore");
-
-    var serialize = require("../").serialize;
-var deserialize = require("../").deserialize;
-var declarePersistable = require("../").declarePersistable;
+if( this.require) {
+    var should = require("should");
+    var serialijse = require("../");
+} else {
+    var should = Should;
+}
+var serialize = serialijse.serialize;
+var deserialize = serialijse.deserialize;
+var declarePersistable = serialijse.declarePersistable;
+var serializeZ = serialijse.serializeZ;
+var deserializeZ = serialijse.deserializeZ;
 
 (function () {
     "use strict";
-
 
     function Color(colorName) {
         this.name = colorName;
@@ -145,9 +149,6 @@ var declarePersistable = require("../").declarePersistable;
         });
 
         it("testing compression impact ",function(done){
-
-            var serializeZ = require("../").serializeZ;
-            var deserializeZ = require("../").deserializeZ;
 
             var vehicules = [new Vehicule(),new Vehicule(),new Vehicule()];
 
