@@ -13,5 +13,5 @@ mocha_test:
 
 
 releaseIt:
-    release-it
-    bower register serialijse  https://github.com/erossignon/serialijse.git
+	release-it
+	bower register serialijse  https://github.com/erossignon/serialijse.git
