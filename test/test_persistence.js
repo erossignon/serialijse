@@ -1,5 +1,5 @@
 /*global describe, it*/
-if( this.require) {
+if(typeof require !== "undefined") {
     var should = require("should");
     var serialijse = require("../");
 } else {
