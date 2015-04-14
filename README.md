@@ -37,10 +37,12 @@ npm install serialijse
 Using serialijse in browser
 ----------------------------
 
+* install serialijse component: 
 ````sh
 bower install serialijse
 ````
 
+* in your html file: 
 ```html
 <script src="components/serialijse/dist/serialijse.bundle.js">
 
