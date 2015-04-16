@@ -1,10 +1,13 @@
 /*global describe, it*/
+var Should;
 if(typeof require !== "undefined") {
-    var should = require("should");
+    Should = require("should");
+
     var serialijse = require("../");
 } else {
-    var should = Should;
 }
+Should(true).eql(true);
+
 var serialize = serialijse.serialize;
 var deserialize = serialijse.deserialize;
 var declarePersistable = serialijse.declarePersistable;
@@ -12,6 +15,10 @@ var serializeZ = serialijse.serializeZ;
 var deserializeZ = serialijse.deserializeZ;
 
 (function () {
+
+
+
+
     "use strict";
 
     function Color(colorName) {
@@ -29,6 +36,8 @@ var deserializeZ = serialijse.deserializeZ;
 
 
     describe("persistence ", function () {
+
+
 
         it("should persist a simple javascript object", function () {
 
@@ -97,7 +106,7 @@ var deserializeZ = serialijse.deserializeZ;
 
             var serializationString = serialize(vehicules);
 
-            should(the_vehicule.____index).eql(undefined);
+            Should(the_vehicule.____index).eql(undefined);
 
             var expected  = '[['+
                     '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
@@ -260,7 +269,7 @@ var deserializeZ = serialijse.deserializeZ;
             valery.parent.should.equal(mark);
             edgar.parent.should.equal(mark);
 
-            should(function(){
+            Should(function(){
                 JSON.stringify(mark);
             }).throwError();   // Circular
 

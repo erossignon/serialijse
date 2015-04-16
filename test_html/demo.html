@@ -21,10 +21,39 @@ function Rectangle() {
 }
 serialijse.declarePersistable(Rectangle);
 
-mocha.checkLeaks();
-mocha.globals(['jQuery']);
-mocha.run();
 
+if (window.mochaPhantomJS) {
+
+
+    console.log(" PhantomJS");
+
+    mocha.checkLeaks();
+    mocha.globals(['jQuery']);
+    mochaPhantomJS.run(function(err) {
+
+        console.log("done 1");
+        mocha.run(function() {
+            takeScreenshot();
+        });
+
+    });
+
+    function takeScreenshot() {
+        if (window.callPhantom) {
+            var date = new Date()
+            var filename = "screenshots/" + date.getTime()
+            console.log("Taking screenshot " + filename)
+            callPhantom({'screenshot': filename})
+        }
+    }
+
+
+}
+else {
+    mocha.run(function() {
+        console.log("done");
+    });
+}
 </script>
 </body>
 </html>

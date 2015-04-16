@@ -9,6 +9,8 @@ before_script:
   - npm install -g mocha
   - npm install -g browserify 
   - npm install -g uglify-js2
+  - npm install -g codeclimate-test-reporter
+  - npm install -g mocha-phantomjs
   - npm install
 
 after_success:
