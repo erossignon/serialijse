@@ -176,3 +176,35 @@ testing_javascript_serialization_objects_with_cyclic_dependencies();
    
    
 ```
+
+TypeScript example
+------------------
+
+```TypeScript   
+import * as serialijse from "serialijse";
+
+class Greeter {
+  constructor(
+    private myName: string
+  ) {}
+
+  greet(name: string): void {
+    console.log(`${this.myName} says: Hello ${name}`);
+  }
+}
+
+let greeter = new Greeter('Spock');
+greeter.greet('Scotty');
+
+// serialize
+serialijse.declarePersistable(Greeter);
+let greeterJson: string = serialijse.serialize(greeter);
+
+// deserialize
+serialijse.declarePersistable(Greeter); // not necessary in this example, but needed if deserializing in a new js context
+let greeter1: Greeter = serialijse.deserialize<Greeter>(greeterJson);
+
+greeter1.greet('Jean-Luc');
+```
+
+

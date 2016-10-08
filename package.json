@@ -38,5 +38,6 @@
   },
   "dependencies": {
     "underscore": "^1.6.0"
-  }
+  },
+  "types": "./lib/serialijse.d.ts"
 }
