@@ -4,7 +4,7 @@
   "description": "serialize and deserialize your javascript objects, preserve your object model ",
   "main": "index.js",
   "scripts": {
-    "pretest": "browserify  index.js --standalone serialijse > dist/serialijse.bundle.js && uglifyjs2 dist/serialijse.bundle.js -o dist/serialijse.bundle.min.js",
+    "pretest": "browserify  index.js --standalone serialijse > dist/serialijse.bundle.js && uglifyjs dist/serialijse.bundle.js -o dist/serialijse.bundle.min.js",
     "test": "mocha -R spec && mocha-phantomjs -R spec  test_html/demo.html"
   },
   "repository": {
@@ -33,11 +33,11 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "latest",
-    "should": "^4.4.2",
-    "uglify-js": "^2.4.15"
+    "should": "^11.1.1",
+    "uglify-js": "^2.7.4"
   },
   "dependencies": {
-    "underscore": "^1.6.0"
+    "underscore": "^1.8.3"
   },
   "types": "./lib/serialijse.d.ts"
 }
