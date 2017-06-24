@@ -16,7 +16,15 @@
     "files": "test/*.js",
     "browsers": [
       "chrome/latest",
-      "firefox/latest"
+      "firefox/latest",
+      "ie/6..latest",
+      "chrome/22..latest",
+      "firefox/16..latest",
+      "safari/latest",
+      "opera/11.0..latest",
+      "iphone/6",
+      "ipad/6",
+      "android-browser/latest"
     ]
   },
   "keywords": [
@@ -37,7 +45,8 @@
     "uglify-js": "^2.7.4"
   },
   "dependencies": {
-    "underscore": "^1.8.3"
   },
   "types": "./lib/serialijse.d.ts"
+
+
 }
