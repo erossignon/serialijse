@@ -1,13 +1,13 @@
 /*global describe, it*/
-var should;
+var Should;
 if (typeof require !== "undefined") {
-    should = require("should");
+    Should = require("should");
 
     var serialijse = require("../");
 } else {
-    should = Should;
+
 }
-should(true).eql(true);
+Should(true).eql(true);
 
 var serialize = serialijse.serialize;
 var deserialize = serialijse.deserialize;
@@ -103,7 +103,7 @@ var deserializeZ = serialijse.deserializeZ;
 
             var serializationString = serialize(vehicules);
 
-            should(the_vehicule.____index).eql(undefined);
+            Should(the_vehicule.____index).eql(undefined);
 
             var expected = '[[' +
               '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
@@ -267,7 +267,7 @@ var deserializeZ = serialijse.deserializeZ;
             valery.parent.should.equal(mark);
             edgar.parent.should.equal(mark);
 
-            should(function () {
+            Should(function () {
                 JSON.stringify(mark);
             }).throwError();   // Circular
 
@@ -315,9 +315,9 @@ var deserializeZ = serialijse.deserializeZ;
 
             var reconstructedObject = deserialize(json_obj);
 
-            should.exist(reconstructedObject.name);
-            should.exist(reconstructedObject._cache);
-            should.exist(reconstructedObject.$someOtherStuff);
+            Should.exist(reconstructedObject.name);
+            Should.exist(reconstructedObject._cache);
+            Should.exist(reconstructedObject.$someOtherStuff);
             reconstructedObject._cache.should.eql([]);
             reconstructedObject.$someOtherStuff.should.eql(0);
 

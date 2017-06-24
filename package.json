@@ -44,9 +44,6 @@
     "should": "^11.2.1",
     "uglify-js": "^3.0.19"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "types": "./lib/serialijse.d.ts"
-
-
 }
