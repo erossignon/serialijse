@@ -7,6 +7,9 @@
     "pretest": "browserify  index.js --standalone serialijse > dist/serialijse.bundle.js && uglifyjs dist/serialijse.bundle.js -o dist/serialijse.bundle.min.js",
     "test": "mocha -R spec && mocha-phantomjs -R spec  test_html/demo.html"
   },
+  "engines": {
+    "node": ">=4.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/erossignon/serialijse.git"
