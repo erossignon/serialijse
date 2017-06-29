@@ -12289,22 +12289,139 @@ exports.deserializeZ = lib.deserializeZ;
 exports.declarePersistable = lib.declarePersistable;
 
 },{"./lib/serialijse":39}],39:[function(require,module,exports){
+(function (global,Buffer){
 (function (exports) {
     "use strict";
     var assert = require("assert");
-    var g_global = {};
+    var g_classInfos = {};
 
     var isFunction = function (obj) {
-        return typeof obj === 'function';
+        return typeof obj === 'function' || obj.prototype;
     };
 
-    function declarePersistable(constructor) {
-        var className = constructor.prototype.constructor.name;
-        if (g_global.hasOwnProperty(className)) {
-            console.warn("warning: declarePersistable : class " + className + " already registered");
+
+    function serializeObject(context, object, rawData ) {
+
+        assert(!rawData.hasOwnProperty("d"));
+
+        rawData.d = {};
+
+        for (var property in object) {
+            if (isPropertyPersistable(object, property)) {
+                if (object[property] !== null) {
+                    rawData.d[property] = _serialize(context,object[property]);
+                }
+            }
         }
-        g_global[className] = constructor;
     }
+
+    function deserializeObject(context, object_id, object_definition) {
+
+        var classInfo = this;
+
+        var object = new classInfo.constructor();
+        context.cache[object_id] = object;
+
+        var rawData = object_definition.d;
+        if (!rawData) {
+            return; // no properties
+        }
+
+        for (var property in rawData) {
+            if (rawData.hasOwnProperty(property)) {
+                try {
+                    object[property] = deserialize_node_or_value(context,rawData[property]);
+                }
+                catch (err) {
+                    console.log(" property : ", property);
+                    console.log(err);
+                    throw err;
+                }
+            }
+        }
+
+        return object;
+
+    }
+
+    function serializeTypedArray(context,typedArray,rawData) {
+        rawData.a = new Buffer(typedArray.buffer).toString("base64");
+    }
+
+    function deserializeTypedArray(context, object_id, rawData) {
+
+        var classInfo = this;
+        assert(typeof rawData.a === "string");
+        var buf = Buffer.from(rawData.a,"base64");
+        var tmp = new Uint8Array(buf);
+        var obj = new classInfo.constructor(tmp.buffer);
+        context.cache[object_id] = obj;
+
+        return obj;
+    }
+
+    function deserialize_node_or_value(context,node) {
+        assert(context);
+        assert(node);
+        if ("object" === typeof node) {
+            return deserialize_node(context,node);
+        }
+        return node;
+    }
+
+    function declarePersistable(constructor, name, serializeFunc, deserializeFunc) {
+
+        var className = constructor.prototype.constructor.name || constructor.name;
+
+        serializeFunc = serializeFunc || serializeObject;
+        deserializeFunc = deserializeFunc || deserializeObject;
+
+        if (name) {
+            className = name;
+        }
+
+        if (g_classInfos.hasOwnProperty(className)) {
+            console.warn("declarePersistable warning: declarePersistable : class " + className + " already registered");
+        }
+        if (!(constructor instanceof Function) && !constructor.prototype) {
+            throw new Error("declarePersistable: Cannot find constructor for " + className);
+        };
+
+        g_classInfos[className] = {
+            constructor: constructor,
+            serializeFunc: serializeFunc,
+            deserializeFunc: deserializeFunc
+        };
+    }
+
+
+    function declareTypedArrayPersistable(typeArrayName) {
+
+        if (!global[typeArrayName]) {
+            console.log("warning : " + typeArrayName + " is not supported in this environment");
+            return;
+        }
+
+        var constructor = global[typeArrayName];
+        // repair constructor name if any
+        if(!constructor.name) {
+            constructor.name = typeArrayName;
+        }
+        // if (!(constructor instanceof Function)) {
+        //     a = new constructor();
+        //     throw new Error("warning : " + typeArrayName + " is not supported FULLY FILLY in this environment"   +typeof constructor,typeof constructor.constructor);
+        // }
+        declarePersistable(constructor, typeArrayName, serializeTypedArray, deserializeTypedArray);
+
+    }
+    declarePersistable(Object, "Object", serializeObject, deserializeObject);
+    declareTypedArrayPersistable("Float32Array");
+    declareTypedArrayPersistable("Uint32Array");
+    declareTypedArrayPersistable("Uint16Array");
+    declareTypedArrayPersistable("Uint8Array");
+    declareTypedArrayPersistable("Int32Array");
+    declareTypedArrayPersistable("Int16Array");
+    declareTypedArrayPersistable("Int8Array");
 
     /**
      * returns true if the property is persistable.
@@ -12321,12 +12438,12 @@ exports.declarePersistable = lib.declarePersistable;
         }
         if (obj.constructor && obj.constructor.serialijseOptions) {
             //
-            const options = obj.constructor.serialijseOptions;
+            var options = obj.constructor.serialijseOptions;
             if (options.ignored) {
                 options.ignored = (options.ignored instanceof Array) ? options.ignored : [options.ignored];
 
                 for (var i = 0; i < options.ignored.length; i++) {
-                    const o = options.ignored[i];
+                    var o = options.ignored[i];
                     if (typeof o === "string") {
                         if (o === propertyName) {
                             return false;
@@ -12342,121 +12459,191 @@ exports.declarePersistable = lib.declarePersistable;
         return true;
     }
 
+    function find_object(context,obj) {
+        if (obj.____index !== undefined) {
+            assert(context.objects[obj.____index] === obj);
+            return obj.____index;
+        }
+        return -1;
+    }
+
+    function add_object_in_index(context, obj, serializing_data) {
+        var id = context.index.length;
+        obj.____index = id;
+        context.index.push(serializing_data);
+        context.objects.push(obj);
+        return id;
+    }
+
+    function extract_object_classname(object) {
+        var className =  object.constructor.name;
+        if (className) {
+            return className;
+        }
+        if(object instanceof Float32Array) { return "Float32Array"; }
+        if(object instanceof Uint32Array) { return "Uint32Array"; }
+        if(object instanceof Uint16Array) { return "Uint16Array"; }
+        if(object instanceof Uint8Array) { return "Uint8Array"; }
+        if(object instanceof Int32Array) { return "Int32Array"; }
+        if(object instanceof Int16Array) { return "Int16Array"; }
+        if(object instanceof Int8Array) { return "Int8Array"; }
+    }
+    function _serialize_object(context, serializingObject, object) {
+
+        assert(context);
+        assert(object !== undefined);
+
+        if (object === null) {
+            serializingObject.o = null;
+            return;
+        }
+
+
+        var className =extract_object_classname(object), s, id;
+
+        // j => json object to follow
+        // d => date
+        // a => array
+        // o => class  { c: className d: data }
+        // o => null
+        // @ => already serialized object
+
+        if (className === "Array") {
+            serializingObject["a"] = object.map(_serialize.bind(null,context));
+            return;
+        }
+        if (className === "Date") {
+            serializingObject["d"] = object.getTime();
+            return;
+        }
+        if (className !== "Object" && !g_classInfos.hasOwnProperty(className)) {
+            console.log(object);
+            throw new Error("class " + className + " is not registered in class Factory - deserialization will not be possible");
+        }
+
+        // check if the object has already been serialized
+        id = find_object(context,object);
+
+        if (id === -1) { // not found
+            // object hasn't yet been serialized
+            s = {c: className };
+            id = add_object_in_index(context,object, s);
+            g_classInfos[className].serializeFunc(context,object, s);
+
+        }
+        serializingObject.o = id;
+        return serializingObject;
+    }
+
+    function _serialize(context, object) {
+
+        assert(context);
+        if (object === undefined) {
+            return undefined;
+        }
+
+        var serializingObject = {};
+
+        switch (typeof object) {
+            case 'number':
+            case 'boolean':
+            case 'string':
+                // basic type
+                return object;
+            case 'object':
+                _serialize_object(context,serializingObject, object);
+                break;
+            default:
+                throw new Error("invalid typeof " + typeof object + " " + JSON.stringify(object, null, " "));
+        }
+
+        return serializingObject;
+    }
+
     function serialize(object) {
 
         assert(object !== undefined, "serialize: expect a valid object to serialize ");
 
-        var index = [];
-        var objects = [];
+        var context = {
+            index: [],
+            objects: []
+        };
 
-        function add_object_in_index(obj, serializing_data) {
-            var id = index.length;
-            obj.____index = id;
-            index.push(serializing_data);
-            objects.push(obj);
+        var obj = _serialize(context, object);
 
-            return id;
-        }
-
-        function find_object(obj) {
-            if (obj.____index !== undefined) {
-                assert(objects[obj.____index] === obj);
-                return obj.____index;
-            }
-            return -1;
-        }
-
-        function _serialize_object(serializingObject, object) {
-
-            assert(object !== undefined);
-
-            if (object === null) {
-                serializingObject.o = null;
-                return;
-            }
-
-
-            var className = object.constructor.name, s, v, id;
-
-            // j => json object to follow
-            // d => date
-            // a => array
-            // o => class  { c: className d: data }
-            // o => null
-            // @ => already serialized object
-
-            if (className === "Array") {
-                serializingObject["a"] = object.map(_serialize);
-                return;
-            }
-            if (className === "Date") {
-                serializingObject["d"] = object.getTime();
-                return;
-            }
-            if (className !== "Object" && !g_global.hasOwnProperty(className)) {
-                throw new Error("class " + className + " is not registered in class Factory - deserialization will not be possible");
-            }
-
-            // check if the object has already been serialized
-            id = find_object(object);
-
-            if (id === -1) { // not found
-                // object hasn't yet been serialized
-                s = {
-                    c: className,
-                    d: {}
-                };
-
-                id = add_object_in_index(object, s);
-
-                for (v in object) {
-                    if (isPropertyPersistable(object, v)) {
-                        // if (object.hasOwnProperty(v) && v !== '____index') {
-                        if (object[v] !== null) {
-                            s.d[v] = _serialize(object[v]);
-                        }
-                    }
-                }
-            }
-            serializingObject.o = id;
-            return serializingObject;
-        }
-
-        function _serialize(object) {
-
-            if (object === undefined) {
-                return undefined;
-            }
-
-            var serializingObject = {};
-
-            switch (typeof object) {
-                case 'number':
-                case 'boolean':
-                case 'string':
-                    // basic type
-                    return object;
-                case 'object':
-                    _serialize_object(serializingObject, object, index);
-                    break;
-                default:
-                    throw new Error("invalid typeof " + typeof object + " " + JSON.stringify(object, null, " "));
-            }
-
-            return serializingObject;
-        }
-        var obj = _serialize(object);
         // unset temporary ___index properties
-        objects.forEach(function (e) {
+        context.objects.forEach(function (e) {
             delete e.____index;
         });
 
-        return JSON.stringify([index, obj]);// ,null," ");
+        return JSON.stringify([context.index, obj]);// ,null," ");
     }
 
 
-    function deserialize(serializationString) {
+    function deserialize_node(context, node) {
+        assert(context);
+        // special treatment
+        if (!node) {
+            return null;
+        }
 
+        if (node.hasOwnProperty("d")) {
+            return new Date(node.d);
+        } else if (node.hasOwnProperty("j")) {
+            return node.j;
+        } else if (node.hasOwnProperty("o")) {
+
+            var object_id = node.o;
+
+            if (object_id === null) {
+                return null;
+            }
+            // check if this object has already been de-serialized
+            if (context.cache[object_id] !== undefined) {
+                return context.cache[object_id];
+            }
+            var serializing_data = context.index[object_id];
+
+            var cache_object = _deserialize_object(context, serializing_data, object_id);
+            assert(context.cache[object_id] === cache_object);
+            return cache_object;
+
+        } else if (node.hasOwnProperty("a")) {
+            // return _deserialize_object(node.o);
+            return node.a.map(deserialize_node_or_value.bind(null,context));
+        }
+        throw new Error("Unsupported deserialize_node" + JSON.stringify(node));
+    }
+
+    function _deserialize_object(context, object_definition, object_id) {
+
+        assert(object_definition.c);
+
+        var className = object_definition.c;
+        var classInfo = g_classInfos[className];
+
+        if (!classInfo) {
+            throw new Error(" Cannot find constructor to deserialize class of type " + className + ". use declarePersistable(Constructor)");
+        }
+        var constructor = classInfo.constructor;
+        assert(isFunction(constructor));
+
+        var obj = classInfo.deserializeFunc(context,object_id, object_definition);
+
+        if (constructor && constructor.serialijseOptions) {
+            // onDeserialize is called immediately after object has been created
+            if (constructor.serialijseOptions.onDeserialize) {
+                constructor.serialijseOptions.onDeserialize(obj);
+            }
+            // onPostDeserialize call is postponed after the main object has been fully de-serializednpm
+            if (constructor.serialijseOptions.onPostDeserialize) {
+                context.postDeserialiseActions.push(obj);
+            }
+        }
+        return obj;
+    }
+
+    function deserialize(serializationString) {
 
         var data;
         if (typeof serializationString === 'string') {
@@ -12464,106 +12651,23 @@ exports.declarePersistable = lib.declarePersistable;
         } else if (typeof serializationString === 'object') {
             data = serializationString;
         }
-        var index = data[0],
-          obj = data[1],
-          cache = [];
-
-        function deserialize_node_or_value(node) {
-            if ("object" === typeof node) {
-                return deserialize_node(node);
-            }
-            return node;
+        if (!(data instanceof Array) ) {
+            throw new Error("Invalid Serialization data");
+        }
+        if (data.length !== 2) {
+            throw new Error("Invalid Serialization data");
         }
 
-        var postDeserialiseActions = [];
+        var rawObject = data[1];
+        var context = {
+            index : data[0],
+            cache : [],
+            postDeserialiseActions: []
+        };
 
-        function deserialize_node(node) {
-            // special treatment
-            if (!node) {
-                return null;
-            }
+        var deserializedObject = deserialize_node(context, rawObject);
 
-            if (node.hasOwnProperty("d")) {
-                return new Date(node.d);
-            } else if (node.hasOwnProperty("j")) {
-                return node.j;
-            } else if (node.hasOwnProperty("o")) {
-
-                var object_id = node.o;
-
-                if (object_id === null) {
-                    return null;
-                }
-                // check if this object has already been de-serialized
-                if (cache[object_id] !== undefined) {
-                    return cache[object_id];
-                }
-                var serializing_data = index[object_id];
-
-                var cache_object = _deserialize_object(serializing_data, object_id);
-                assert(cache[object_id] === cache_object);
-                return cache_object;
-
-            } else if (node.hasOwnProperty("a")) {
-                // return _deserialize_object(node.o);
-                return node.a.map(deserialize_node_or_value);
-            }
-            throw new Error("Unsupported deserialize_node" + JSON.stringify(node));
-        }
-
-        function _deserialize_object(object_definition, object_id) {
-
-            var constructor, obj, data, v, className;
-
-            assert(object_definition.c);
-            assert(object_definition.d);
-
-            className = object_definition.c;
-            data = object_definition.d;
-
-            if (className === "Object") {
-                obj = {};
-            } else {
-                constructor = g_global[className];
-                if (!constructor) {
-                    throw new Error(" Cannot find constructor to deserialize class of type " + className + ". use declarePersistable(Constructor)");
-                }
-                assert(isFunction(constructor));
-                obj = new constructor();
-            }
-
-            cache[object_id] = obj;
-            for (v in data) {
-                if (data.hasOwnProperty(v)) {
-                    try {
-                        obj[v] = deserialize_node_or_value(data[v]);
-                    }
-                    catch (err) {
-                        console.log(" property : ", v);
-                        console.log(err);
-                        throw err;
-                    }
-                }
-            }
-
-            if (constructor && constructor.serialijseOptions) {
-                // onDeserialize is called immediately after object has been created
-                if (constructor.serialijseOptions.onDeserialize) {
-                    constructor.serialijseOptions.onDeserialize(obj);
-                }
-                // onPostDeserialize call is postponed after the main object has been fully de-serializednpm
-                if (constructor.serialijseOptions.onPostDeserialize) {
-                    console.log("qdqsdq");
-                    postDeserialiseActions.push(obj);
-                }
-            }
-            return obj;
-        }
-
-
-        var deserializedObject =  deserialize_node(obj);
-
-        postDeserialiseActions.forEach(function(o){
+        context.postDeserialiseActions.forEach(function (o) {
             o.constructor.serialijseOptions.onPostDeserialize(o);
         });
 
@@ -12583,11 +12687,9 @@ exports.declarePersistable = lib.declarePersistable;
             }
             callback(null, buff);
         });
-
     };
 
     exports.deserializeZ = function (data, callback) {
-
         var zlib = require("zlib");
         zlib.inflate(data, function (err, buff) {
             if (err) {
@@ -12595,12 +12697,12 @@ exports.declarePersistable = lib.declarePersistable;
             }
             callback(null, deserialize(buff.toString()));
         });
-
     };
 
 
 })(typeof exports === 'undefined' ? this['serialijse'] = {} : exports);
 
 
-},{"assert":1,"zlib":5}]},{},[38])(38)
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
+},{"assert":1,"buffer":7,"zlib":5}]},{},[38])(38)
 });

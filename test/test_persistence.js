@@ -346,11 +346,10 @@ var deserializeZ = serialijse.deserializeZ;
 
             reconstructedObject._cache.should.eql(["reconstructCache has been called"]);
         });
-
-
+        
         it("should persist typed array such as Float32Array", function () {
 
-            const obj = {
+            var obj = {
                 float32: new Float32Array([1, 2, 3, 5, 6, 10, 100]),
                 uint32: new Int32Array([1, 2, 3, 5, 6, 10, 100])
 
