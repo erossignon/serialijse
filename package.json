@@ -42,7 +42,7 @@
   "devDependencies": {
     "mocha": "^3.4.2",
     "should": "^11.2.1",
-    "uglify-js": "^3.0.19"
+    "uglify-js": "^3.0.21"
   },
   "dependencies": {},
   "types": "./lib/serialijse.d.ts"

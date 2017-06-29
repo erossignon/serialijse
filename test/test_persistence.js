@@ -4,8 +4,6 @@ if (typeof require !== "undefined") {
     Should = require("should");
 
     var serialijse = require("../");
-} else {
-
 }
 Should(true).eql(true);
 
@@ -161,7 +159,7 @@ var deserializeZ = serialijse.deserializeZ;
             var uncompressed_serializationString = serialize(vehicules);
 
             serializeZ(vehicules, function (err, buffer) {
-                var serializationString = buffer.toString("base64");
+                //xx var serializationString = buffer.toString("base64");
 
                 var compression_ratio = Math.round(100.0 - 100.0 * (buffer.length / uncompressed_serializationString.length));
                 console.log("           = ", uncompressed_serializationString.length, "compressed =", buffer.length, " ratio ", compression_ratio, "%");
@@ -242,7 +240,6 @@ var deserializeZ = serialijse.deserializeZ;
 
         });
 
-
         it("unlike JSON.stringify/parse, it should persist object that contains cyclic object value", function () {
 
             function Person(name) {
@@ -287,7 +284,6 @@ var deserializeZ = serialijse.deserializeZ;
             mark_reloaded.children[1].name.should.eql("edgar");
         });
 
-
         function MyClassWithUnpersistableMembers() {
             this.name = "unset";
             this._cache = [];
@@ -327,18 +323,21 @@ var deserializeZ = serialijse.deserializeZ;
             this.name = "unset";
             this._cache = [];
         }
-        MyClassWithPostDeserializeAction.prototype.reconstructCache = function(){
+
+        MyClassWithPostDeserializeAction.prototype.reconstructCache = function () {
             this._cache.push("reconstructCache has been called");
         };
         MyClassWithPostDeserializeAction.serialijseOptions = {
             ignored: [
                 "_cache"
             ],
-            onPostDeserialize: function(o) { o.reconstructCache(); }
+            onPostDeserialize: function (o) {
+                o.reconstructCache();
+            }
         };
         declarePersistable(MyClassWithPostDeserializeAction);
 
-        it("should run onPostDeserialize  during deserialization", function () {
+        it("should run onPostDeserialize during deserialization", function () {
             var obj = new MyClassWithPostDeserializeAction();
             obj._cache.push(36);
 
@@ -346,6 +345,40 @@ var deserializeZ = serialijse.deserializeZ;
             var reconstructedObject = deserialize(serializationString);
 
             reconstructedObject._cache.should.eql(["reconstructCache has been called"]);
+        });
+
+
+        it("should persist typed array such as Float32Array", function () {
+
+            const obj = {
+                float32: new Float32Array([1, 2, 3, 5, 6, 10, 100]),
+                uint32: new Int32Array([1, 2, 3, 5, 6, 10, 100])
+
+            };
+
+            obj.float32[5].should.eql(10.0);
+            obj.float32[6].should.eql(100);
+
+            obj.uint32[5].should.eql(10.0);
+            obj.uint32[6].should.eql(100);
+
+            var serializationString = serialize(obj);
+
+            //xx console.log("serializationString", serializationString);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.float32.should.be.instanceof(Float32Array);
+            reconstructedObject.uint32.should.be.instanceof(Int32Array);
+
+            reconstructedObject.float32.length.should.eql(obj.float32.length);
+            reconstructedObject.uint32.length.should.eql(obj.uint32.length);
+
+            reconstructedObject.float32[5].should.eql(10.0);
+            reconstructedObject.float32[6].should.eql(100);
+
+            reconstructedObject.uint32[5].should.eql(10.0);
+            reconstructedObject.uint32[6].should.eql(100);
+
         });
     });
 
