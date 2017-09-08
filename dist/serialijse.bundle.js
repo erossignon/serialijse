@@ -12295,21 +12295,35 @@ exports.declarePersistable = lib.declarePersistable;
     var assert = require("assert");
     var g_classInfos = {};
 
+    // note: phantomjs may not define  Object.assign by default so we need the pony fill
+    var objectAssign = Object.assign || require("object-assign");
+
     var isFunction = function (obj) {
         return typeof obj === 'function' || obj.prototype;
     };
 
 
-    function serializeObject(context, object, rawData ) {
+    function merge_options(options1,options2) {
+       return  objectAssign({},options1, options2);
+    }
+    function serializeObject(context, object, rawData , global_options ) {
 
         assert(!rawData.hasOwnProperty("d"));
 
         rawData.d = {};
 
+        var options = global_options || {};
+        if (object.constructor && object.constructor.serialijseOptions) {
+            options = merge_options(options,object.constructor.serialijseOptions);
+        }
+        if (options.ignored) {
+            options.ignored = (options.ignored instanceof Array) ? options.ignored : [options.ignored];
+        }
+
         for (var property in object) {
-            if (isPropertyPersistable(object, property)) {
+            if (isPropertyPersistable(object, property, options)) {
                 if (object[property] !== null) {
-                    rawData.d[property] = _serialize(context,object[property]);
+                    rawData.d[property] = _serialize(context,object[property], options);
                 }
             }
         }
@@ -12362,7 +12376,6 @@ exports.declarePersistable = lib.declarePersistable;
 
     function deserialize_node_or_value(context,node) {
         assert(context);
-        assert(node);
         if ("object" === typeof node) {
             return deserialize_node(context,node);
         }
@@ -12429,29 +12442,24 @@ exports.declarePersistable = lib.declarePersistable;
      * @param propertyName
      * @returns {boolean}
      */
-    function isPropertyPersistable(obj, propertyName) {
+    function isPropertyPersistable(obj, propertyName ,options) {
         if (!obj.hasOwnProperty(propertyName)) {
             return false;
         }
         if (propertyName === '____index') {
             return false;
         }
-        if (obj.constructor && obj.constructor.serialijseOptions) {
-            //
-            var options = obj.constructor.serialijseOptions;
-            if (options.ignored) {
-                options.ignored = (options.ignored instanceof Array) ? options.ignored : [options.ignored];
+        if (options && options.ignored) {
 
-                for (var i = 0; i < options.ignored.length; i++) {
-                    var o = options.ignored[i];
-                    if (typeof o === "string") {
-                        if (o === propertyName) {
-                            return false;
-                        }
-                    } else if (o instanceof RegExp) {
-                        if (propertyName.match(o)) {
-                            return false
-                        }
+            for (var i = 0; i < options.ignored.length; i++) {
+                var o = options.ignored[i];
+                if (typeof o === "string") {
+                    if (o === propertyName) {
+                        return false;
+                    }
+                } else if (o instanceof RegExp) {
+                    if (propertyName.match(o)) {
+                        return false;
                     }
                 }
             }
@@ -12488,7 +12496,7 @@ exports.declarePersistable = lib.declarePersistable;
         if(object instanceof Int16Array) { return "Int16Array"; }
         if(object instanceof Int8Array) { return "Int8Array"; }
     }
-    function _serialize_object(context, serializingObject, object) {
+    function _serialize_object(context, serializingObject, object , options) {
 
         assert(context);
         assert(object !== undefined);
@@ -12528,14 +12536,14 @@ exports.declarePersistable = lib.declarePersistable;
             // object hasn't yet been serialized
             s = {c: className };
             id = add_object_in_index(context,object, s);
-            g_classInfos[className].serializeFunc(context,object, s);
+            g_classInfos[className].serializeFunc(context,object, s, options);
 
         }
         serializingObject.o = id;
         return serializingObject;
     }
 
-    function _serialize(context, object) {
+    function _serialize(context, object, options ) {
 
         assert(context);
         if (object === undefined) {
@@ -12551,7 +12559,7 @@ exports.declarePersistable = lib.declarePersistable;
                 // basic type
                 return object;
             case 'object':
-                _serialize_object(context,serializingObject, object);
+                _serialize_object(context,serializingObject, object, options);
                 break;
             default:
                 throw new Error("invalid typeof " + typeof object + " " + JSON.stringify(object, null, " "));
@@ -12560,7 +12568,14 @@ exports.declarePersistable = lib.declarePersistable;
         return serializingObject;
     }
 
-    function serialize(object) {
+    /**
+     *
+     * @param object            {object} object to serialize
+     * @param [options]         {object} optional options
+     * @param [options.ignored] {string|regexp|Array<string|regexp>} pattern for field to not serialize
+     * @return {string}
+     */
+    function serialize(object,options) {
 
         assert(object !== undefined, "serialize: expect a valid object to serialize ");
 
@@ -12569,7 +12584,7 @@ exports.declarePersistable = lib.declarePersistable;
             objects: []
         };
 
-        var obj = _serialize(context, object);
+        var obj = _serialize(context, object, options);
 
         // unset temporary ___index properties
         context.objects.forEach(function (e) {
@@ -12704,5 +12719,97 @@ exports.declarePersistable = lib.declarePersistable;
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"assert":1,"buffer":7,"zlib":5}]},{},[38])(38)
+},{"assert":1,"buffer":7,"object-assign":40,"zlib":5}],40:[function(require,module,exports){
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+'use strict';
+/* eslint-disable no-unused-vars */
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (err) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}]},{},[38])(38)
 });

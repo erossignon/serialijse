@@ -14,7 +14,7 @@ before_script:
   - npm install -g browserify 
   - npm install -g uglify-js
   - npm install -g codeclimate-test-reporter
-  - npm install -g mocha-phantomjs
+  - npm install -g mocha-phantomjs object-assign
   - npm install
 
 after_success:
