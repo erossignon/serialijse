@@ -1,6 +1,6 @@
 {
   "name": "serialijse",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "serialize and deserialize your javascript objects, preserve your object model ",
   "main": "index.js",
   "scripts": {
@@ -43,9 +43,12 @@
   "author": "Etienne Rossignon",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^3.4.2",
-    "should": "^11.2.1",
-    "uglify-js": "^3.0.21"
+    "mocha": "^3.5.0",
+    "should": "^13.0.1",
+    "uglify-js": "^3.0.28"
+  },
+  "optionalDependencies": {
+    "zlib": "1.0.5"
   },
   "dependencies": {},
   "types": "./lib/serialijse.d.ts"

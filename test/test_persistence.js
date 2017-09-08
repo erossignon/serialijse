@@ -305,6 +305,7 @@ var deserializeZ = serialijse.deserializeZ;
             obj._cache = [1, 2, 3];
             obj.$someOtherStuff = 35;
             obj.name = "Hello";
+            obj.$$key = "24";
 
             var serializationString = serialize(obj);
             var json_obj = JSON.parse(serializationString);
@@ -314,6 +315,8 @@ var deserializeZ = serialijse.deserializeZ;
             Should.exist(reconstructedObject.name);
             Should.exist(reconstructedObject._cache);
             Should.exist(reconstructedObject.$someOtherStuff);
+
+            Should.not.exist(reconstructedObject.$$key);
             reconstructedObject._cache.should.eql([]);
             reconstructedObject.$someOtherStuff.should.eql(0);
 
@@ -366,8 +369,8 @@ var deserializeZ = serialijse.deserializeZ;
             //xx console.log("serializationString", serializationString);
             var reconstructedObject = deserialize(serializationString);
 
-            reconstructedObject.float32.should.be.instanceof(Float32Array);
-            reconstructedObject.uint32.should.be.instanceof(Int32Array);
+            reconstructedObject.float32.should.be.instanceOf(Float32Array);
+            reconstructedObject.uint32.should.be.instanceOf(Int32Array);
 
             reconstructedObject.float32.length.should.eql(obj.float32.length);
             reconstructedObject.uint32.length.should.eql(obj.uint32.length);
@@ -379,6 +382,28 @@ var deserializeZ = serialijse.deserializeZ;
             reconstructedObject.uint32[6].should.eql(100);
 
         });
+    });
+    it("should be possible to filter out member we don't want to serialize at any level (such as $$ angular extra prop)",function() {
+
+        var obj = {
+            name:"foo",
+            $$key:1,
+            address: {
+                city: "Paris",
+                $$key:2,
+            }
+        };
+
+        var data = serialize(obj,{ignored: [/^\$\$.*/]});
+        var obj2 = deserialize(data);
+
+        obj2.should.have.property("name");
+        obj2.should.have.property("address");
+        obj2.address.should.have.property("city");
+
+        obj2.should.not.have.property("$$key");
+        obj2.address.should.not.have.property("$$key");
+
     });
 
 }());
