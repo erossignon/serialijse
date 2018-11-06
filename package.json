@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "pretest": "browserify  index.js --standalone serialijse > dist/serialijse.bundle.js && uglifyjs dist/serialijse.bundle.js -o dist/serialijse.bundle.min.js",
-    "test": "mocha -R spec && mocha-phantomjs -R spec  test_html/demo.html"
+    "test": "npx mocha -R spec && npx mocha-headless-chrome -f test_html/demo.html"
   },
   "engines": {
     "node": ">=4.0"
@@ -43,14 +43,15 @@
   "author": "Etienne Rossignon",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^3.5.0",
-    "should": "^13.0.1",
-    "uglify-js": "^3.0.28"
+    "mocha": "^5.2.0",
+    "should": "^13.2.3",
+    "uglify-js": "^3.4.9"
   },
   "optionalDependencies": {
     "object-assign": "^4.1.1",
+    "buffer": "^5.2.1",
     "zlib": "1.0.5"
   },
-  "dependencies": {},
-  "types": "./lib/serialijse.d.ts"
+  "types": "./lib/serialijse.d.ts",
+  "dependencies": {}
 }

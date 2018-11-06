@@ -22,10 +22,10 @@ before_script:
   - npm install -g istanbul
   - npm install coveralls
   - npm install -g mocha
-  - npm install -g browserify 
+  - npm install -g browserify buffer
   - npm install -g uglify-js
   - npm install -g codeclimate-test-reporter
-  - npm install -g mocha-phantomjs object-assign
+  - npm install -g mocha-headless-chrome object-assign
   - npm install
 
 after_success:

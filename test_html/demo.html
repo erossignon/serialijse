@@ -1,59 +1,18 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>Mocha Tests</title>
-    <link rel="stylesheet" href="mocha.css" />
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
 </head>
-<script src="./mocha.js"></script>
-<script src="./should.js"></script>
-<script src="../dist/serialijse.bundle.js"></script>
-<script>mocha.setup('bdd')</script>
-<script src="../test/test_persistence.js"></script>
-</html>
 <body>
-
 <div id="mocha"></div>
-
-<script language="javascript">
-
-function Rectangle() {
-
-}
-serialijse.declarePersistable(Rectangle);
-
-
-if (window.mochaPhantomJS) {
-
-
-    console.log(" PhantomJS");
-
-    mocha.checkLeaks();
-    mocha.globals(['jQuery']);
-    mochaPhantomJS.run(function(err) {
-
-        console.log("done 1");
-        mocha.run(function() {
-            takeScreenshot();
-        });
-
-    });
-
-    function takeScreenshot() {
-        if (window.callPhantom) {
-            var date = new Date()
-            var filename = "screenshots/" + date.getTime()
-            console.log("Taking screenshot " + filename)
-            callPhantom({'screenshot': filename})
-        }
-    }
-
-
-}
-else {
-    mocha.run(function() {
-        console.log("done");
-    });
-}
-</script>
+<script src="./should.js"></script>
+<script src="../node_modules/mocha/mocha.js"></script>
+<script src="../dist/serialijse.bundle.js"></script>
+<script>mocha.setup('bdd');</script>
+<script>mocha.checkLeaks();</script>
+<script src="../test/test_persistence.js"></script>
+<script>mocha.run();</script>
 </body>
 </html>

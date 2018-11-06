@@ -2,10 +2,8 @@
 var Should;
 if (typeof require !== "undefined") {
     Should = require("should");
-
     var serialijse = require("../");
 }
-Should(true).eql(true);
 
 var serialize = serialijse.serialize;
 var deserialize = serialijse.deserialize;
@@ -382,27 +380,29 @@ var deserializeZ = serialijse.deserializeZ;
             reconstructedObject.uint32[6].should.eql(100);
 
         });
-    });
-    it("should be possible to filter out member we don't want to serialize at any level (such as $$ angular extra prop)",function() {
 
-        var obj = {
-            name:"foo",
-            $$key:1,
-            address: {
-                city: "Paris",
-                $$key:2,
-            }
-        };
+        it("should be possible to filter out member we don't want to serialize at any level (such as $$ angular extra prop)",function() {
 
-        var data = serialize(obj,{ignored: [/^\$\$.*/]});
-        var obj2 = deserialize(data);
+            var obj = {
+                name:"foo",
+                $$key:1,
+                address: {
+                    city: "Paris",
+                    $$key:2,
+                }
+            };
 
-        obj2.should.have.property("name");
-        obj2.should.have.property("address");
-        obj2.address.should.have.property("city");
+            var data = serialize(obj,{ignored: [/^\$\$.*/]});
+            var obj2 = deserialize(data);
 
-        obj2.should.not.have.property("$$key");
-        obj2.address.should.not.have.property("$$key");
+            obj2.should.have.property("name");
+            obj2.should.have.property("address");
+            obj2.address.should.have.property("city");
+
+            obj2.should.not.have.property("$$key");
+            obj2.address.should.not.have.property("$$key");
+
+        });
 
     });
 
