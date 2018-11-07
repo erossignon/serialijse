@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "pretest": "browserify  index.js --standalone serialijse > dist/serialijse.bundle.js && uglifyjs dist/serialijse.bundle.js -o dist/serialijse.bundle.min.js",
-    "test": "npx mocha -R spec && npx mocha-headless-chrome -f test_html/demo.html"
+    "test": "npx mocha -R spec && npx mocha-headless-chrome  -a no-sandbox -f test_html/demo.html"
   },
   "engines": {
     "node": ">=4.0"
