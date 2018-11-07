@@ -19,6 +19,7 @@ matrix:
 
 
 before_script:
+  - npm install -g npm
   - npm install -g istanbul
   - npm install coveralls
   - npm install -g mocha
