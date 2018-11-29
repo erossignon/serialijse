@@ -53,5 +53,7 @@
     "zlib": "1.0.5"
   },
   "types": "./lib/serialijse.d.ts",
-  "dependencies": {}
+  "dependencies": {
+    "stack-trace": "0.0.10" 
+  }
 }
