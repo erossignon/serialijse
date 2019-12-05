@@ -24,6 +24,7 @@ var deserializeZ = serialijse.deserializeZ;
         this.price = 10000.05;
         this.color = new Color("blue");
         this.created_on = new Date("04 May 1956 GMT");
+        this.second_hand = false
     }
 
     declarePersistable(Vehicule);
@@ -31,6 +32,52 @@ var deserializeZ = serialijse.deserializeZ;
 
 
     describe("persistence ", function () {
+
+        it("should serialize true", function () {
+
+            var bool = true;
+            var serializationString = serialize(bool);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.true();
+
+        });
+
+        it("should serialize false", function () {
+
+            var serializationString = serialize(false);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.false();
+
+        });
+
+        it("should serialize string", function () {
+            var str = "Vehicule";
+            var serializationString = serialize(str);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.eql(str);
+        });
+
+        it("should serialize number", function () {
+            var pi = Math.PI
+            var serializationString = serialize(pi);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.eql(pi);
+        });
+
+        it("should serialize null", function () {
+            var serializationString = serialize(null);
+            var reconstructedObject = deserialize(serializationString);
+
+            should.strictEqual(reconstructedObject, null);
+        });
+
+        it("should fail to serialize undefined", function () {
+            should.throws(function() {serialize(undefined)});
+        });
 
         it("should persist a simple javascript object (pojo)", function () {
 
@@ -102,7 +149,7 @@ var deserializeZ = serialijse.deserializeZ;
             Should(the_vehicule.____index).eql(undefined);
 
             var expected = '[[' +
-              '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
+              '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000},"second_hand":false}},' +
               '{"c":"Color","d":{"name":"blue"}}' +
               '],' + '{"a":[{"o":0},{"o":0}]}]';
 
