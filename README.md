@@ -1,3 +1,7 @@
+[![Actions Status](https://github.com/antonymarion/serialijse/workflows/testNodeLatest/badge.svg)](https://github.com/antonymarion/serialijse/actions)
+
+
+
 serialijse
 ==========
 
