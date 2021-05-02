@@ -34,7 +34,7 @@ var deserializeZ = serialijse.deserializeZ;
 
         it("should persist a simple javascript object (pojo)", function () {
 
-            var vehicule = {name: "GM"};
+            var vehicule = { name: "GM" };
             var serializationString = serialize(vehicule);
             //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
@@ -102,9 +102,9 @@ var deserializeZ = serialijse.deserializeZ;
             Should(the_vehicule.____index).eql(undefined);
 
             var expected = '[[' +
-              '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
-              '{"c":"Color","d":{"name":"blue"}}' +
-              '],' + '{"a":[{"o":0},{"o":0}]}]';
+                '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
+                '{"c":"Color","d":{"name":"blue"}}' +
+                '],' + '{"a":[{"o":0},{"o":0}]}]';
 
             serializationString.should.eql(expected);
 
@@ -160,7 +160,7 @@ var deserializeZ = serialijse.deserializeZ;
                 //xx var serializationString = buffer.toString("base64");
 
                 var compression_ratio = Math.round(100.0 - 100.0 * (buffer.length / uncompressed_serializationString.length));
-                console.log("           = ", uncompressed_serializationString.length, "compressed =", buffer.length, " ratio ", compression_ratio, "%");
+                // console.log("           = ", uncompressed_serializationString.length, "compressed =", buffer.length, " ratio ", compression_ratio, "%");
                 deserializeZ(buffer, function (err, reconstructedObject) {
                     done(err);
                     reconstructedObject.should.eql(vehicules);
@@ -256,8 +256,8 @@ var deserializeZ = serialijse.deserializeZ;
             };
 
             var mark = new Person("mark"),
-              valery = mark.addChild("valery"),
-              edgar = mark.addChild("edgar");
+                valery = mark.addChild("valery"),
+                edgar = mark.addChild("edgar");
 
             valery.parent.should.equal(mark);
             edgar.parent.should.equal(mark);
@@ -347,7 +347,7 @@ var deserializeZ = serialijse.deserializeZ;
 
             reconstructedObject._cache.should.eql(["reconstructCache has been called"]);
         });
-        
+
         it("should persist typed array such as Float32Array", function () {
 
             var obj = {
@@ -381,18 +381,18 @@ var deserializeZ = serialijse.deserializeZ;
 
         });
 
-        it("should be possible to filter out member we don't want to serialize at any level (such as $$ angular extra prop)",function() {
+        it("should be possible to filter out member we don't want to serialize at any level (such as $$ angular extra prop)", function () {
 
             var obj = {
-                name:"foo",
-                $$key:1,
+                name: "foo",
+                $$key: 1,
                 address: {
                     city: "Paris",
-                    $$key:2,
+                    $$key: 2,
                 }
             };
 
-            var data = serialize(obj,{ignored: [/^\$\$.*/]});
+            var data = serialize(obj, { ignored: [/^\$\$.*/] });
             var obj2 = deserialize(data);
 
             obj2.should.have.property("name");
@@ -404,6 +404,47 @@ var deserializeZ = serialijse.deserializeZ;
 
         });
 
+        it("should persist a Map", () => {
+            const obj = {
+                map: new Map()
+            };
+            obj.map.set("A", 1);
+            obj.map.set("B", { c: "d" });
+            obj.map.set("C", obj.map); /// << Circumar
+
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+
+            reconstructedObject.map.should.be.instanceOf(Map);
+            reconstructedObject.map.get("A").should.eql(1);
+            reconstructedObject.map.get("B").should.eql({c:"d"});
+            reconstructedObject.map.get("C").should.eql(reconstructedObject.map);
+
+
+        })
+        it("should persist a Set", () => {
+            const obj = {
+                c: { c: "d"},
+                set: new Set()
+            };
+            obj.d = { d: obj.set };
+
+            obj.set.add("A");
+            obj.set.add(obj.c);
+            obj.set.add(obj.d);
+
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            // xx console.log(serializationString);
+            // xx console.log(reconstructedObject);
+
+            reconstructedObject.set.has("A").should.eql(true);
+            reconstructedObject.set.has(reconstructedObject.c).should.eql(true);
+            
+
+        })
     });
 
 }());
