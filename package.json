@@ -1,6 +1,6 @@
 {
   "name": "serialijse",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "serialize and deserialize your javascript objects, preserve your object model ",
   "main": "index.js",
   "scripts": {
