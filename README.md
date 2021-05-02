@@ -47,17 +47,19 @@ bower install serialijse
 <script src="components/serialijse/dist/serialijse.bundle.js">
 
 <script>
-var serialize = serialijse.serialize;
-var deserialize = serialijse.deserialize;
-var declarePersistable = serialijse.declarePersistable;
-var serializeZ = serialijse.serializeZ;
-var deserializeZ = serialijse.deserializeZ;
+const {
+    serialize,
+    deserialize,
+    declarePersistable,
+    serializeZ,
+    deserializeZ,
+} = serialijse;
 
-var vehicule = new Vehicule();
+const vehicule = new Vehicule();
 ...
-var serializationString = serialize(vehicule);
+const serializationString = serialize(vehicule);
 ...
-var reconstructedObject = deserialize(serializationString);
+const reconstructedObject = deserialize(serializationString);
 
 </script>
 ```
@@ -208,3 +210,23 @@ greeter1.greet('Jean-Luc');
 ```
 
 
+## ignoring some members during serialization
+
+Sometime, you may want to ignore some members in serialization
+```javascript
+class MyClassWithUnpersistableMembers {
+    constructor() {
+        this.name = "unset";
+        this._cache = [];
+        this.$someOtherStuff = 0;
+    }
+}
+
+MyClassWithUnpersistableMembers.serialijseOptions = {
+    ignored: [
+        "_cache",  // list here the mebmer you want to ignore
+        /$.*/      // use regExp if you need to as well.
+    ]
+};
+declarePersistable(MyClassWithUnpersistableMembers);
+```
