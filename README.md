@@ -4,7 +4,7 @@ serialijse
 serialize and deserialize javascript object, preserve your object model. persistance and serialization in javascript and nodejs.
 
 
-[![Build Status](https://travis-ci.org/erossignon/serialijse.svg?branch=master)](https://travis-ci.org/erossignon/serialijse)
+[![Node.js CI](https://github.com/erossignon/serialijse/actions/workflows/node.js.yml/badge.svg)](https://github.com/erossignon/serialijse/actions/workflows/node.js.yml)
 [![Coverage Status](https://img.shields.io/coveralls/erossignon/serialijse.svg)](https://coveralls.io/r/erossignon/serialijse)
 [![Code Climate](https://codeclimate.com/github/erossignon/serialijse.png)](https://codeclimate.com/github/erossignon/serialijse)
 
