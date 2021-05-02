@@ -192,9 +192,7 @@ var deserializeZ = serialijse.deserializeZ;
             vehicule.toto = null;
             var serializationString = serialize(vehicule);
 
-            // delete it as it should not interfere
-            delete vehicule.toto;
-
+           
             var reconstructedObject = deserialize(serializationString);
             reconstructedObject.should.eql(vehicule);
 
