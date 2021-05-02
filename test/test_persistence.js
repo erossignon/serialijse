@@ -39,7 +39,7 @@ var deserializeZ = serialijse.deserializeZ;
             var serializationString = serialize(bool);
             var reconstructedObject = deserialize(serializationString);
 
-            reconstructedObject.should.true();
+            reconstructedObject.should.eql(true);
 
         });
 
@@ -48,7 +48,7 @@ var deserializeZ = serialijse.deserializeZ;
             var serializationString = serialize(false);
             var reconstructedObject = deserialize(serializationString);
 
-            reconstructedObject.should.false();
+            reconstructedObject.should.eql(false);
 
         });
 
@@ -71,8 +71,7 @@ var deserializeZ = serialijse.deserializeZ;
         it("should serialize null", function () {
             var serializationString = serialize(null);
             var reconstructedObject = deserialize(serializationString);
-
-            should.strictEqual(reconstructedObject, null);
+            should.equal(reconstructedObject, null);
         });
 
         it("should fail to serialize undefined", function () {
@@ -485,7 +484,84 @@ var deserializeZ = serialijse.deserializeZ;
 
             reconstructedObject.set.has("A").should.eql(true);
             reconstructedObject.set.has(reconstructedObject.c).should.eql(true);
-            
+
+        });
+        it("should persist a Uint8Array", ()=>{
+
+            const obj = new Uint8Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Uint8Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        });
+        it("should persist a Uint16Array", ()=>{
+
+            const obj = new Uint16Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Uint16Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        })
+        it("should persist a Uint32Array", ()=>{
+
+            const obj = new Uint32Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Uint32Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        })
+        it("should persist a Float32Array", ()=>{
+
+            const obj = new Float32Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Float32Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        })
+        it("should persist a Float64Array", ()=>{
+
+            const obj = new Float64Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Float64Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        });
+
+        it("onDeserialize options", ()=>{
+            function SomeClassXYZ() {
+                this.name = "unset";
+                this._cache = [];
+                this.$someOtherStuff = 0;
+            }
+    
+            SomeClassXYZ.serialijseOptions = {
+                ignored: [
+                    "_cache",
+                    /$.*/
+                ],
+                onDeserialize: (o) =>{
+                    o._wasHere =true;
+                }
+            };
+            declarePersistable(SomeClassXYZ);
+    
+            const rect1 = new SomeClassXYZ();
+            rect1.name = "100";
+    
+            const serializationString = serialize(rect1);
+          
+            const rect2 = deserialize(serializationString);
+            rect2._wasHere.should.eql(true);
 
         })
     });
