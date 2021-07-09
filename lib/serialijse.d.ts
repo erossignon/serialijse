@@ -1,5 +1,17 @@
 declare module "serialijse" {
-    export function serialize<T>(object: T, options?: object): string;
+    export type IgnoreSpec = string | RegExp
+
+    export interface SerializeContext {
+      index: any[],
+      objects: any[]
+    }
+
+    export interface SerializeOptions {
+        ignored?: IgnoreSpec[]|IgnoreSpec
+        errorHandler?: (context: SerializeContext, options: SerializeOptions, object: any, _throw: () => any) => any;
+    }
+
+    export function serialize<T>(object: T, options?: SerializeOptions): string;
 
     export function deserialize<T>(serializationString: string): T;
 

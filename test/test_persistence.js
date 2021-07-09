@@ -1,7 +1,7 @@
 /*global describe, it*/
-var Should;
+var should;
 if (typeof require !== "undefined") {
-    Should = require("should");
+    should = require("should");
     var serialijse = require("../");
 }
 
@@ -24,6 +24,7 @@ var deserializeZ = serialijse.deserializeZ;
         this.price = 10000.05;
         this.color = new Color("blue");
         this.created_on = new Date("04 May 1956 GMT");
+        this.second_hand = false
     }
 
     declarePersistable(Vehicule);
@@ -32,9 +33,54 @@ var deserializeZ = serialijse.deserializeZ;
 
     describe("persistence ", function () {
 
+        it("should serialize true", function () {
+
+            var bool = true;
+            var serializationString = serialize(bool);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.eql(true);
+
+        });
+
+        it("should serialize false", function () {
+
+            var serializationString = serialize(false);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.eql(false);
+
+        });
+
+        it("should serialize string", function () {
+            var str = "Vehicule";
+            var serializationString = serialize(str);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.eql(str);
+        });
+
+        it("should serialize number", function () {
+            var pi = Math.PI
+            var serializationString = serialize(pi);
+            var reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.eql(pi);
+        });
+
+        it("should serialize null", function () {
+            var serializationString = serialize(null);
+            var reconstructedObject = deserialize(serializationString);
+            should.equal(reconstructedObject, null);
+        });
+
+        it("should fail to serialize undefined", function () {
+            should.throws(function() {serialize(undefined)});
+        });
+
         it("should persist a simple javascript object (pojo)", function () {
 
-            var vehicule = {name: "GM"};
+            var vehicule = { name: "GM" };
             var serializationString = serialize(vehicule);
             //xx console.log(serializationString);
             var reconstructedObject = deserialize(serializationString);
@@ -99,12 +145,10 @@ var deserializeZ = serialijse.deserializeZ;
 
             var serializationString = serialize(vehicules);
 
-            Should(the_vehicule.____index).eql(undefined);
+            should(the_vehicule.____index).eql(undefined);
 
-            var expected = '[[' +
-              '{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000}}},' +
-              '{"c":"Color","d":{"name":"blue"}}' +
-              '],' + '{"a":[{"o":0},{"o":0}]}]';
+            var expected = 
+            `[[{"c":"Vehicule","d":{"brand":"Citroen","price":95000,"color":{"o":1},"created_on":{"d":-651981600000},"second_hand":false}},{"c":"Color","d":{"name":"blue"}}],{"a":[{"o":0},{"o":0}]}]`;
 
             serializationString.should.eql(expected);
 
@@ -160,7 +204,7 @@ var deserializeZ = serialijse.deserializeZ;
                 //xx var serializationString = buffer.toString("base64");
 
                 var compression_ratio = Math.round(100.0 - 100.0 * (buffer.length / uncompressed_serializationString.length));
-                console.log("           = ", uncompressed_serializationString.length, "compressed =", buffer.length, " ratio ", compression_ratio, "%");
+                // console.log("           = ", uncompressed_serializationString.length, "compressed =", buffer.length, " ratio ", compression_ratio, "%");
                 deserializeZ(buffer, function (err, reconstructedObject) {
                     done(err);
                     reconstructedObject.should.eql(vehicules);
@@ -192,9 +236,7 @@ var deserializeZ = serialijse.deserializeZ;
             vehicule.toto = null;
             var serializationString = serialize(vehicule);
 
-            // delete it as it should not interfere
-            delete vehicule.toto;
-
+           
             var reconstructedObject = deserialize(serializationString);
             reconstructedObject.should.eql(vehicule);
 
@@ -256,13 +298,13 @@ var deserializeZ = serialijse.deserializeZ;
             };
 
             var mark = new Person("mark"),
-              valery = mark.addChild("valery"),
-              edgar = mark.addChild("edgar");
+                valery = mark.addChild("valery"),
+                edgar = mark.addChild("edgar");
 
             valery.parent.should.equal(mark);
             edgar.parent.should.equal(mark);
 
-            Should(function () {
+            should(function () {
                 JSON.stringify(mark);
             }).throwError();   // Circular
 
@@ -310,11 +352,11 @@ var deserializeZ = serialijse.deserializeZ;
 
             var reconstructedObject = deserialize(json_obj);
 
-            Should.exist(reconstructedObject.name);
-            Should.exist(reconstructedObject._cache);
-            Should.exist(reconstructedObject.$someOtherStuff);
+            should.exist(reconstructedObject.name);
+            should.exist(reconstructedObject._cache);
+            should.exist(reconstructedObject.$someOtherStuff);
 
-            Should.not.exist(reconstructedObject.$$key);
+            should.not.exist(reconstructedObject.$$key);
             reconstructedObject._cache.should.eql([]);
             reconstructedObject.$someOtherStuff.should.eql(0);
 
@@ -347,7 +389,7 @@ var deserializeZ = serialijse.deserializeZ;
 
             reconstructedObject._cache.should.eql(["reconstructCache has been called"]);
         });
-        
+
         it("should persist typed array such as Float32Array", function () {
 
             var obj = {
@@ -381,18 +423,18 @@ var deserializeZ = serialijse.deserializeZ;
 
         });
 
-        it("should be possible to filter out member we don't want to serialize at any level (such as $$ angular extra prop)",function() {
+        it("should be possible to filter out member we don't want to serialize at any level (such as $$ angular extra prop)", function () {
 
             var obj = {
-                name:"foo",
-                $$key:1,
+                name: "foo",
+                $$key: 1,
                 address: {
                     city: "Paris",
-                    $$key:2,
+                    $$key: 2,
                 }
             };
 
-            var data = serialize(obj,{ignored: [/^\$\$.*/]});
+            var data = serialize(obj, { ignored: [/^\$\$.*/] });
             var obj2 = deserialize(data);
 
             obj2.should.have.property("name");
@@ -404,6 +446,124 @@ var deserializeZ = serialijse.deserializeZ;
 
         });
 
+        it("should persist a Map", () => {
+            const obj = {
+                map: new Map()
+            };
+            obj.map.set("A", 1);
+            obj.map.set("B", { c: "d" });
+            obj.map.set("C", obj.map); /// << Circumar
+
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+
+            reconstructedObject.map.should.be.instanceOf(Map);
+            reconstructedObject.map.get("A").should.eql(1);
+            reconstructedObject.map.get("B").should.eql({c:"d"});
+            reconstructedObject.map.get("C").should.eql(reconstructedObject.map);
+
+
+        })
+        it("should persist a Set", () => {
+            const obj = {
+                c: { c: "d"},
+                set: new Set()
+            };
+            obj.d = { d: obj.set };
+
+            obj.set.add("A");
+            obj.set.add(obj.c);
+            obj.set.add(obj.d);
+
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            // xx console.log(serializationString);
+            // xx console.log(reconstructedObject);
+
+            reconstructedObject.set.has("A").should.eql(true);
+            reconstructedObject.set.has(reconstructedObject.c).should.eql(true);
+
+        });
+        it("should persist a Uint8Array", ()=>{
+
+            const obj = new Uint8Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Uint8Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        });
+        it("should persist a Uint16Array", ()=>{
+
+            const obj = new Uint16Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Uint16Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        })
+        it("should persist a Uint32Array", ()=>{
+
+            const obj = new Uint32Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Uint32Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        })
+        it("should persist a Float32Array", ()=>{
+
+            const obj = new Float32Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Float32Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        })
+        it("should persist a Float64Array", ()=>{
+
+            const obj = new Float64Array([1,2,3,4]);
+            const serializationString = serialize(obj);
+            const reconstructedObject = deserialize(serializationString);
+
+            reconstructedObject.should.be.instanceof(Float64Array);
+
+            obj.toString().should.eql(reconstructedObject.toString());
+        });
+
+        it("onDeserialize options", ()=>{
+            function SomeClassXYZ() {
+                this.name = "unset";
+                this._cache = [];
+                this.$someOtherStuff = 0;
+            }
+    
+            SomeClassXYZ.serialijseOptions = {
+                ignored: [
+                    "_cache",
+                    /$.*/
+                ],
+                onDeserialize: (o) =>{
+                    o._wasHere =true;
+                }
+            };
+            declarePersistable(SomeClassXYZ);
+    
+            const rect1 = new SomeClassXYZ();
+            rect1.name = "100";
+    
+            const serializationString = serialize(rect1);
+          
+            const rect2 = deserialize(serializationString);
+            rect2._wasHere.should.eql(true);
+
+        })
     });
 
 }());

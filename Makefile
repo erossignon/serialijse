@@ -1,7 +1,7 @@
 test-cov: istanbul
 
 istanbul:
-	istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec test --recursive
+	npx nyc  node ./node_modules/mocha/bin/_mocha -- -R spec test --recursive
 
 coveralls:
 	cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
@@ -13,5 +13,5 @@ mocha_test:
 
 
 releaseIt:
-	release-it
-	bower register serialijse  https://github.com/erossignon/serialijse.git
+	npx release-it
+	npx bower register serialijse  https://github.com/erossignon/serialijse.git
